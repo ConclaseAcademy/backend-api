@@ -1,5 +1,6 @@
 ﻿using Asp.Versioning;
-using MentalHealthCompanion.Data.DTO;
+using MentalHealthCompanion.Data.DTO.RequestDto;
+using MentalHealthCompanion.Data.Enums;
 using MentalHealthCompanion.Data.Interface;
 using Microsoft.AspNetCore.Mvc;
 
@@ -25,6 +26,19 @@ namespace MentalHealthCompanion.API.Controllers.v1
             var result = await _authenticationService.LoginAsync(loginRequestDto, token);
             return result.IsSuccessful ? Ok(result) : BadRequest(result);
 
+        }
+
+        [HttpPost]
+        [Route("register")]
+        public async Task<IActionResult> Registration([FromQuery] UserRole role, [FromBody] UserRegistrationRequestDto model)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(GenerateValidationErrorResponse(ModelState));
+
+            RegistrationRequestDto registrationRequest = new(role.ToString());
+
+            var response = await _authenticationService.RegisterAsync(model, registrationRequest);
+            return response.IsSuccessful ? Ok(response) : BadRequest(response);
         }
     }
 }

@@ -1,8 +1,12 @@
 using MentalHealthCompanion.API.ApplicationExtension;
 using MentalHealthCompanion.Data;
 using MentalHealthCompanion.Data.DataContext;
+using MentalHealthCompanion.Data.Interface;
+using MentalHealthCompanion.Data.Services;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using SendGrid.Extensions.DependencyInjection;
 using Serilog;
 using System.Text.Json.Serialization;
 
@@ -26,7 +30,26 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>()
                 .AddEntityFrameworkStores<AppDbContext>()
                 .AddDefaultTokenProviders();
 
-builder.Services.AddControllers();
+builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
+builder.Services.AddScoped<IEmailNotificationService, EmailNotificationService>();
+builder.Services.AddScoped<IJwtService, JwtService>();
+
+//register sendgrid
+
+var sender = "info@conclaseacademy.com";
+var from = "Conclase Academy";
+var apiKey = builder.Configuration["SendGrid:ApiKey"];
+
+builder.Services.AddFluentEmail(sender, from)
+    .AddSendGridSender(apiKey);
+
+builder.Services
+    .AddSendGrid(options =>
+    {
+        options.ApiKey = apiKey;
+    });
+
+//builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

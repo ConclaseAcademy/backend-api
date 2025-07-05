@@ -9,5 +9,7 @@
         public string? Role { get; set; }
         public bool IsAccountActivated { get; set; } = false;
         public string EmailAddress { get; set; } = string.Empty;
+
+        public string? Password {  get; set; }
     }
 }

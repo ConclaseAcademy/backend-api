@@ -1,4 +1,4 @@
-﻿namespace MentalHealthCompanion.Data.DTO
+﻿namespace MentalHealthCompanion.Data.DTO.RequestDto
 {
     public class LoginRequestDto
     {
