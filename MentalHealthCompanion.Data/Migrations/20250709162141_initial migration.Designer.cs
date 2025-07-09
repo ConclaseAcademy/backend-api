@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MentalHealthCompanion.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250703131633_initial Migration")]
-    partial class initialMigration
+    [Migration("20250709162141_initial migration")]
+    partial class initialmigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -46,6 +46,9 @@ namespace MentalHealthCompanion.Data.Migrations
                     b.Property<bool>("IsAccountActivated")
                         .HasColumnType("boolean");
 
+                    b.Property<bool>("IsAdminPasswordChanged")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("LastName")
                         .HasColumnType("text");
 
@@ -56,9 +59,13 @@ namespace MentalHealthCompanion.Data.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("Role")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("EmailAddress")
+                        .IsUnique();
 
                     b.ToTable("AppUsers");
                 });

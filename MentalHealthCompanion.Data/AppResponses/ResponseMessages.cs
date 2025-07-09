@@ -12,5 +12,6 @@
         public const string TokenError = "An error generating token.";
         public const string Exception = "Something went wrong, please try again later.";
         public const string InvalidPassword = "Invalid credentials.";
+        public const string UpdateException = "user with email already exists";
     }
 }

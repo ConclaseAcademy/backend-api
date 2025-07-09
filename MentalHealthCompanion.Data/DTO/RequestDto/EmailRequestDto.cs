@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace MentalHealthCompanion.Data.DTO.RequestDto
+﻿namespace MentalHealthCompanion.Data.DTO.RequestDto
 {
     public class EmailRequestDto
     {

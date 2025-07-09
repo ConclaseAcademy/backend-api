@@ -18,12 +18,20 @@ namespace MentalHealthCompanion.Data.DataContext
             var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
             var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
 
-            var adminRoleName = UserRole.SuperAdmin.ToString();
-
+            var superAdminRoleName = UserRole.SuperAdmin.ToString();
+            var adminRoleName = UserRole.Admin.ToString();
+            var regularUserRoleName = UserRole.RegularUser.ToString();
+            if (!await roleManager.RoleExistsAsync(regularUserRoleName))
+            { 
+                await roleManager.CreateAsync(new IdentityRole(regularUserRoleName));
+            }
+            if (!await roleManager.RoleExistsAsync(superAdminRoleName))
+            {
+                await roleManager.CreateAsync(new IdentityRole(superAdminRoleName));
+            }
             if (!await roleManager.RoleExistsAsync(adminRoleName))
             {
-                var adminRole = new IdentityRole(adminRoleName);
-                await roleManager.CreateAsync(adminRole);
+                await roleManager.CreateAsync(new IdentityRole(adminRoleName));
             }
 
             const string adminEmail = "D.abudu@conclaseint.com";
@@ -47,7 +55,6 @@ namespace MentalHealthCompanion.Data.DataContext
                         string.Join(", ", createdResult.Errors.Select(e => e.Description)));
                 }
                 await userManager.AddToRoleAsync(identityUser, adminRoleName);
-
             }
             else
             {
@@ -62,7 +69,7 @@ namespace MentalHealthCompanion.Data.DataContext
                     FirstName = "SuperAdmin",
                     LastName = "User",
                     EmailAddress = "D.abudu@conclaseint.com",
-                    Role = adminRoleName
+                    Role = superAdminRoleName
                 };
                 dbContext.AppUsers.Add(adminUser);
                 await dbContext.SaveChangesAsync();

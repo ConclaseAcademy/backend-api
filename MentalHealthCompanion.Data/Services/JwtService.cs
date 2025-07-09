@@ -1,6 +1,8 @@
 ﻿using MentalHealthCompanion.Data.DatabaseEntities;
 using MentalHealthCompanion.Data.Interface;
+using MentalHealthCompanion.Data.Options;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -11,9 +13,11 @@ namespace MentalHealthCompanion.Data.Services
     public class JwtService : IJwtService
     {
         private readonly ILogger<JwtService> _logger;
-        public JwtService(ILogger<JwtService> logger)
+        private readonly IOptionsMonitor<JwtOptions> _jwtOptions;
+        public JwtService(ILogger<JwtService> logger, IOptionsMonitor<JwtOptions> jwtOptions)
         {
             _logger = logger;
+            _jwtOptions = jwtOptions;
         }
 
         public string GenerateToken(AppUser appUser, CancellationToken cancellationToken)
@@ -23,8 +27,8 @@ namespace MentalHealthCompanion.Data.Services
                 var now = DateTime.UtcNow;
                 JwtSecurityTokenHandler jwtHandler = new();
 
-                var secretKey = "YourSuperSecretKeyHere&YourSuperSecretKeyHere";
-                var encodedKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)); 
+                var secretKey = _jwtOptions.CurrentValue.SigningKey;
+                var encodedKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
 
                 List<Claim> claims = new()
                 {
@@ -33,7 +37,7 @@ namespace MentalHealthCompanion.Data.Services
                     new Claim(ClaimTypes.Name, appUser.FirstName ?? "Unknown"),
                     new Claim(ClaimTypes.Role, appUser.Role ?? "User"),
                     new Claim(JwtRegisteredClaimNames.Sub, appUser.EmailAddress),
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                    new Claim(JwtRegisteredClaimNames.Jti, new DateTimeOffset(now).ToUnixTimeSeconds().ToString()),
                     new Claim(JwtRegisteredClaimNames.Iat, now.ToString()),
                     new Claim(JwtRegisteredClaimNames.Email, appUser.EmailAddress),
                     new Claim(JwtRegisteredClaimNames.FamilyName, appUser.LastName ?? "Unknown"),
@@ -44,8 +48,8 @@ namespace MentalHealthCompanion.Data.Services
                     Subject = new ClaimsIdentity(claims),
                     Expires = now.AddHours(1), 
                     IssuedAt = now,
-                    Issuer = "MentalHealthCompanion",
-                    Audience = "MentalHealthCompanionUsers",
+                    Issuer = _jwtOptions.CurrentValue.Issuer,
+                    Audience = _jwtOptions.CurrentValue.Audience,
                     SigningCredentials = new SigningCredentials(encodedKey, SecurityAlgorithms.HmacSha256)
                 };
                 SecurityToken securityToken = jwtHandler.CreateToken(tokenDescriptor);

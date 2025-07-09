@@ -43,22 +43,26 @@ namespace MentalHealthCompanion.Data.Migrations
                     b.Property<bool>("IsAccountActivated")
                         .HasColumnType("boolean");
 
+                    b.Property<bool>("IsAdminPasswordChanged")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("LastName")
                         .HasColumnType("text");
 
                     b.Property<string>("MiddleName")
                         .HasColumnType("text");
 
-                    b.Property<string>("Password")
-                        .HasColumnType("text");
-
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("text");
 
                     b.Property<string>("Role")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("EmailAddress")
+                        .IsUnique();
 
                     b.ToTable("AppUsers");
                 });

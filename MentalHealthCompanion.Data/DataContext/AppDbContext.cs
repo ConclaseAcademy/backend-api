@@ -15,5 +15,17 @@ namespace MentalHealthCompanion.Data.DataContext
         public DbSet<AppUser> AppUsers { get; set; }
         public DbSet<UserRegistration> UserRegistrations { get; set; }
 
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+
+            builder.Entity<AppUser>(entity =>
+            {
+                entity.HasKey(x => x.Id);
+                entity.HasIndex(x => x.EmailAddress).IsUnique();
+
+            });
+        }
+
     }
 }

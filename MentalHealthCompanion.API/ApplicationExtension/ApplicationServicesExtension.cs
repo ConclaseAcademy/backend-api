@@ -2,8 +2,13 @@
 using MentalHealthCompanion.Data.Interface;
 using MentalHealthCompanion.Data.Services;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.IdentityModel.Tokens;
 using SendGrid.Extensions.DependencyInjection;
+using System.Security.Claims;
+using System.Text;
 
 namespace MentalHealthCompanion.API.ApplicationExtension
 {
@@ -39,6 +44,14 @@ namespace MentalHealthCompanion.API.ApplicationExtension
                 {
                     options.ApiKey = apiKey;
                 });
+            #endregion
+
+            #region Authentication
+            services.AddAuthorization(option =>
+            {
+                option.AddPolicy("CreateAdmin", config => config.RequireClaim(ClaimTypes.Role, "SuperAdmin"));
+                option.AddPolicy("AdminPassword", config => config.RequireClaim(ClaimTypes.Role, "Admin"));
+            });
             #endregion
 
             return services;
