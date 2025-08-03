@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  mental-health-db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - mental-health-network
+
+  # .NET Backend API
+  mental-health-dotnet-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - mental-health-db
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__Database: "Host=mental-health-db;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}"
+      JwtOptions__SigningKey: ${JWT_SECRET}
+      JwtOptions__Issuer: ${JWT_ISSUER}
+      JwtOptions__Audience: ${JWT_AUDIENCE}
+      JwtOptions__Subject: ${JWT_SUBJECT}
+    ports:
+      - "8000:80"
+    networks:
+      - mental-health-network
+
+  # Node.js Backend API
+  mental-health-node-api:
+    build:
+      context: ./MentalHealthCompanionNodeJS.api
+      dockerfile: Dockerfile
+    depends_on:
+      - mental-health-db
+    environment:
+      DB_HOST: ${NODE_DB_HOST}
+      DB_PORT: ${NODE_DB_PORT}
+      DB_NAME: ${NODE_DB_NAME}
+      DB_USER: ${NODE_DB_USER}
+      DB_PASSWORD: ${NODE_DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+    ports:
+      - "3000:3000"
+    networks:
+      - mental-health-network
+
+volumes:
+  pgdata:
+
+networks:
+  mental-health-network:
