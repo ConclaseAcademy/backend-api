@@ -41,11 +41,11 @@ services:
     depends_on:
       - mental-health-db
     environment:
-      DB_HOST: ${NODE_DB_HOST}
-      DB_PORT: ${NODE_DB_PORT}
-      DB_NAME: ${NODE_DB_NAME}
-      DB_USER: ${NODE_DB_USER}
-      DB_PASSWORD: ${NODE_DB_PASSWORD}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_DATABASE: ${DB_DATABASE}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
       JWT_SECRET: ${JWT_SECRET}
     ports:
       - "3000:3000"
